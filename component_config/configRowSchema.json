@@ -1,1 +1,31 @@
-{}
+{
+  "type": "object",
+  "title": "extractor row",
+  "required": [
+    "connection"
+  ],
+  "properties": {
+    "connection": {
+      "type": "string",
+      "title": "Connection",
+      "enum": [
+        "fail",
+        "succeed"
+      ],
+      "propertyOrder": 1
+    },
+    "test_columns": {
+      "type": "array",
+      "format": "select",
+      "items": {
+        "type": "string"
+      },
+      "options": {
+        "async": {
+          "label": "Re-load test columns",
+          "action": "testColumns"
+        }
+      }
+    }
+  }
+}
