@@ -54,6 +54,7 @@ class Component(ComponentBase):
         if connection == "fail":
             raise UserException("failed")
         elif connection == "succeed":
+            # this is ignored by KBC when run as sync action.
             logging.info("succeed")
 
     def run(self):
