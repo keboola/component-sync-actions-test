@@ -2,18 +2,21 @@
   "type": "object",
   "title": "extractor configuration",
   "required": [
-    "print_hello"
+    "connection"
   ],
   "properties": {
-    "print_hello": {
-      "type": "boolean",
-      "title": "Print Hello",
+    "connection": {
+      "type": "string",
+      "title": "Connection",
+      "enum": [
+        "fail",
+        "succeed"
+      ],
       "propertyOrder": 1
     },
-    "debug": {
-      "type": "boolean",
-      "title": "Debug",
-      "propertyOrder": 2
+    "test_connection": {
+      "type": "button",
+      "format": "test-connection"
     }
   }
 }
