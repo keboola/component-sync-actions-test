@@ -72,7 +72,7 @@ class Component(ComponentBase):
     # overriden base
     def execute_action(self):
         """
-        Executes action defined in the configuration. The action name must match implemented method.
+        Executes action defined in the configuration.
         The default action is 'run'.
         """
         action = self.configuration.action
