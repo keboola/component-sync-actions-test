@@ -11,6 +11,7 @@ KEY_TEST_CONNECTION = 'connection'
 REQUIRED_PARAMETERS = []
 REQUIRED_IMAGE_PARS = []
 
+# this goes to base
 _SYNC_ACTIONS = dict()
 
 
@@ -57,6 +58,7 @@ class Component(ComponentBase):
     def run(self):
         logging.info("running")
 
+    # overriden base
     def execute_action(self):
         """
         Executes action defined in the configuration. The action name must match implemented method.
