@@ -34,14 +34,23 @@ def sync_action(action_name: str):
                 logging.getLogger().setLevel(logging.FATAL)
             else:
                 stdout_redirect = sys.stdout
+            try:
+                # when success, only specified message can be on output, so redirect stdout before.
+                with contextlib.redirect_stdout(stdout_redirect):
+                    result = func(self, *args, **kwargs)
 
-            # when success, only specified message can be on output, so redirect stdout before.
-            with contextlib.redirect_stdout(stdout_redirect):
-                result = func(self, *args, **kwargs)
+                if is_sync_action:
+                    sys.stdout.write(json.dumps({'status': 'success'}))
 
-            if is_sync_action:
-                sys.stdout.write(json.dumps({'status': 'success'}))
-            return result
+                return result
+
+            except Exception as e:
+                if is_sync_action:
+                    # sync actions expect stderr
+                    sys.stderr.write(str(e))
+                    exit(1)
+                else:
+                    raise e
 
         return action_wrapper
 
