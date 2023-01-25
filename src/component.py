@@ -1,3 +1,4 @@
+import contextlib
 import json
 import logging
 import sys
@@ -27,11 +28,18 @@ def sync_action(action_name: str):
             is_sync_action = self.configuration.action != 'run'
 
             # do operations with func
-            result = func(self, *args, **kwargs)
+            if is_sync_action:
+                stdout_redirect = None
+                # mute logging just in case
+                logging.getLogger().setLevel(logging.FATAL)
+            else:
+                stdout_redirect = sys.stdout
+
+            # when success, only specified message can be on output, so redirect stdout before.
+            with contextlib.redirect_stdout(stdout_redirect):
+                result = func(self, *args, **kwargs)
 
             if is_sync_action:
-                # when success, only specified message can be on output, so flush before.
-                sys.stdout.flush()
                 sys.stdout.write(json.dumps({'status': 'success'}))
             return result
 
@@ -49,6 +57,7 @@ class Component(ComponentBase):
     @sync_action('testConnection')
     def test_connection(self):
         logging.info("Testing Connection")
+        print("test print")
         params = self.configuration.parameters
         connection = params.get(KEY_TEST_CONNECTION)
         if connection == "fail":
