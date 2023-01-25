@@ -23,6 +23,15 @@ class Component(ComponentBase):
         elif connection == "succeed":
             logging.info("succeed")
 
+    def test_connection(self):
+        logging.info("Testing Connection")
+        params = self.configuration.parameters
+        connection = params.get(KEY_TEST_CONNECTION)
+        if connection == "fail":
+            raise UserException("failed")
+        elif connection == "succeed":
+            logging.info("succeed")
+
     def run(self):
         logging.info("running")
 
