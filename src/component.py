@@ -1,4 +1,5 @@
 import logging
+import json
 
 from keboola.component.base import ComponentBase
 from keboola.component.exceptions import UserException
@@ -22,6 +23,7 @@ class Component(ComponentBase):
             raise UserException("failed")
         elif connection == "succeed":
             logging.info("succeed")
+            logging.info(json.dumps({'status': 'success'}))
         return {'status': 'success'}
 
     def run(self):
