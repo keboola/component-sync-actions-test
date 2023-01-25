@@ -80,10 +80,6 @@ class Component(ComponentBase):
             logging.warning("No action defined in the configuration, using the default run action.")
             action = 'run'
 
-        if action == 'run':
-            # logging in action mode needs to result in valid JSON
-            logging.info(f"Running action run")
-
         try:
             # apply action mapping
             if action != 'run':
