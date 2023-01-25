@@ -1,5 +1,6 @@
 import json
 import logging
+from functools import wraps
 
 from keboola.component.base import ComponentBase
 from keboola.component.exceptions import UserException
@@ -10,33 +11,41 @@ KEY_TEST_CONNECTION = 'connection'
 REQUIRED_PARAMETERS = []
 REQUIRED_IMAGE_PARS = []
 
+_SYNC_ACTIONS = dict()
 
-def sync_action(func):
-    def action_wrapper(self, *args, **kwargs):
-        # override when run as sync action, because it could be also called normally within run
-        is_sync_action = self.configuration.action != 'run'
 
-        if is_sync_action:
-            # set logger to stdout
-            self.set_default_logger()
+def sync_action(action_name: str):
+    def decorate(func):
+        # to allow pythonic names / action name mapping
+        _SYNC_ACTIONS[action_name] = func.__name__
 
-        # do operations with func
-        result = func(self, *args, **kwargs)
+        @wraps(func)
+        def action_wrapper(self, *args, **kwargs):
+            # override when run as sync action, because it could be also called normally within run
+            is_sync_action = self.configuration.action != 'run'
+            if is_sync_action:
+                # set logger to stdout
+                self.set_default_logger()
 
-        if is_sync_action:
-            logging.info(json.dumps({'status': 'success'}))
+            # do operations with func
+            result = func(self, *args, **kwargs)
 
-        return result
+            if is_sync_action:
+                logging.info(json.dumps({'status': 'success'}))
 
-    return action_wrapper
+            return result
+
+        return action_wrapper
+
+    return decorate
 
 
 class Component(ComponentBase):
     def __init__(self):
         super().__init__()
 
-    @sync_action
-    def testConnection(self):
+    @sync_action('testConnection')
+    def test_connection(self):
         logging.info("Testing Connection")
         params = self.configuration.parameters
         connection = params.get(KEY_TEST_CONNECTION)
@@ -47,6 +56,27 @@ class Component(ComponentBase):
 
     def run(self):
         logging.info("running")
+
+    def execute_action(self):
+        """
+        Executes action defined in the configuration. The action name must match implemented method.
+        The default action is 'run'.
+        """
+        action = self.configuration.action
+        if not action:
+            logging.warning("No action defined in the configuration, using the default run action.")
+            action = 'run'
+
+        logging.info(f"Running action: {action}")
+        try:
+            # apply action mapping
+            if action != 'run':
+                action = _SYNC_ACTIONS[action]
+
+            action_method = getattr(self, action)
+        except (AttributeError, KeyError) as e:
+            raise AttributeError(f"The defined action {action} is not implemented!") from e
+        return action_method()
 
 
 """
