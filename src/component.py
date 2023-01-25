@@ -40,6 +40,7 @@ def sync_action(action_name: str):
                     result = func(self, *args, **kwargs)
 
                 if is_sync_action:
+                    # sync action expects valid JSON in stdout on success.
                     sys.stdout.write(json.dumps({'status': 'success'}))
 
                 return result
