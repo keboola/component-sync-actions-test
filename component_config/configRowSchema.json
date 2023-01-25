@@ -19,6 +19,7 @@
       "format": "select",
       "uniqueItems": true,
       "items": {
+        "enum": [],
         "type": "string"
       },
       "options": {

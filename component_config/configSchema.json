@@ -22,6 +22,7 @@
       "type": "array",
       "format": "select",
       "items": {
+        "enum": [],
         "type": "string"
       },
       "options": {
