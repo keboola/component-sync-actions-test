@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 from functools import wraps
 
 from keboola.component.base import ComponentBase
@@ -24,16 +25,14 @@ def sync_action(action_name: str):
         def action_wrapper(self, *args, **kwargs):
             # override when run as sync action, because it could be also called normally within run
             is_sync_action = self.configuration.action != 'run'
-            if is_sync_action:
-                # set logger to stdout
-                self.set_default_logger()
 
             # do operations with func
             result = func(self, *args, **kwargs)
 
             if is_sync_action:
-                logging.info(json.dumps({'status': 'success'}))
-
+                # when success, only specified message can be on output, so flush before.
+                sys.stdout.flush()
+                sys.stdout.write(json.dumps({'status': 'success'}))
             return result
 
         return action_wrapper
@@ -44,6 +43,8 @@ def sync_action(action_name: str):
 class Component(ComponentBase):
     def __init__(self):
         super().__init__()
+        # to verify it works even when stdout logger is on.
+        self.set_default_logger()
 
     @sync_action('testConnection')
     def test_connection(self):
