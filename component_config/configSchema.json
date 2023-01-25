@@ -17,6 +17,19 @@
     "test_connection": {
       "type": "button",
       "format": "test-connection"
+    },
+    "test_columns": {
+      "type": "array",
+      "format": "select",
+      "items": {
+        "type": "string"
+      },
+      "options": {
+        "async": {
+          "label": "Re-load test columns",
+          "action": "testColumns"
+        }
+      }
     }
   }
 }

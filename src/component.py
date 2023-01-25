@@ -41,7 +41,11 @@ def sync_action(action_name: str):
 
                 if is_sync_action:
                     # sync action expects valid JSON in stdout on success.
-                    sys.stdout.write(json.dumps({'status': 'success'}))
+                    if result:
+                        # expect array or object:
+                        sys.stdout.write(json.dumps(result))
+                    else:
+                        sys.stdout.write(json.dumps({'status': 'success'}))
 
                 return result
 
@@ -63,6 +67,14 @@ class Component(ComponentBase):
         super().__init__()
         # to verify it works even when stdout logger is on.
         self.set_default_logger()
+
+    @sync_action('testColumns')
+    def get_columns(self):
+        return [
+            {"label": 'Joe', "value": 'joe'},
+            {"label": 'Doe', "value": 'doe'},
+            {"label": 'Jane', "value": 'jane'}
+        ]
 
     @sync_action('testConnection')
     def test_connection(self):
