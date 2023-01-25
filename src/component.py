@@ -11,10 +11,31 @@ REQUIRED_PARAMETERS = []
 REQUIRED_IMAGE_PARS = []
 
 
+def sync_action(func):
+    def action_wrapper(self, *args, **kwargs):
+        # override when run as sync action, because it could be also called normally within run
+        is_sync_action = self.configuration.action != 'run'
+
+        if is_sync_action:
+            # set logger to stdout
+            self.set_default_logger()
+
+        # do operations with func
+        result = func(self, *args, **kwargs)
+
+        if is_sync_action:
+            logging.info(json.dumps({'status': 'success'}))
+
+        return result
+
+    return action_wrapper
+
+
 class Component(ComponentBase):
     def __init__(self):
         super().__init__()
 
+    @sync_action
     def testConnection(self):
         logging.info("Testing Connection")
         params = self.configuration.parameters
@@ -23,9 +44,6 @@ class Component(ComponentBase):
             raise UserException("failed")
         elif connection == "succeed":
             logging.info("succeed")
-            logging.info(json.dumps({'status': 'success'}))
-            print(json.dumps({'status': 'success'}))
-        return {'status': 'success'}
 
     def run(self):
         logging.info("running")
