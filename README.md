@@ -1,5 +1,4 @@
-Test connection
-=============
+# UI Testing in Keboola Connection
 
 Description
 
@@ -7,77 +6,110 @@ Description
 
 [TOC]
 
-Functionality notes
-===================
+## Sync Action limitations
 
-Prerequisites
-=============
+Data is exchanged via `stdout` or `stderr`.
 
-Get the API token, register application, etc.
+- All success responses have to output valid JSON string. Meaning nothing can log into the stdout during the action exectution
+- For success action the output needs to be always `{"status":"success"}` in stdout.
+- Sync actions need to be registered in the Developer Portal first.
 
-Features
-========
+## Framework Support
 
-| **Feature**             | **Note**                                      |
-|-------------------------|-----------------------------------------------|
-| Generic UI form         | Dynamic UI form                               |
-| Row Based configuration | Allows structuring the configuration in rows. |
-| oAuth                   | oAuth authentication enabled                  |
-| Incremental loading     | Allows fetching data in new increments.       |
-| Backfill mode           | Support for seamless backfill setup.          |
-| Date range filter       | Specify date range.                           |
+Decorator `sync_action` was added. It takes one parameter `action_name` that will create mapping between the actual method 
+and the sync action name registered in the Developer Portal.
 
-Supported endpoints
-===================
+- Decorated methods can also be called from within the program and return values. 
+- They can log normally -> when run as sync action all logging within the method is muted.
+- When a return value is produced, it is expected to be `dict` or `list` object. These will be printed to stdout at the end.
+- Exceptions can be thrown normally and the message will be propagated to the platform.
 
-If you need more endpoints, please submit your request to
-[ideas.keboola.com](https://ideas.keboola.com/)
 
-Configuration
-=============
+### Example
 
-Param 1
--------
+```python
+  @sync_action('testConnection')
+    def test_connection(self):
+        logging.info("Testing Connection")
+        print("test print")
+        params = self.configuration.parameters
+        connection = params.get(KEY_TEST_CONNECTION)
+        if connection == "fail":
+            raise UserException("failed")
+        elif connection == "succeed":
+            # this is ignored by KBC when run as sync action.
+            logging.info("succeed")
+```
 
-Param 2
--------
+## Test Connection
 
-Output
-======
+Action name must be `testConnection`
 
-List of tables, foreign keys, schema.
+```json
+"test_connection": {
+      "type": "button",
+      "format": "test-connection"
+    }
+```
 
-Development
------------
+```python
+  @sync_action('testConnection')
+    def test_connection(self):
+        logging.info("Testing Connection")
+        print("test print")
+        params = self.configuration.parameters
+        connection = params.get(KEY_TEST_CONNECTION)
+        if connection == "fail":
+            raise UserException("failed")
+        elif connection == "succeed":
+            # this is ignored by KBC when run as sync action.
+            logging.info("succeed")
+```
 
-If required, change local data folder (the `CUSTOM_FOLDER` placeholder) path to
-your custom path in the `docker-compose.yml` file:
+## Populate select/multiselect values
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    volumes:
-      - ./:/code
-      - ./CUSTOM_FOLDER:/data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Allows populating select values. 
 
-Clone this repository, init the workspace and run the component with following
-command:
+```json
+{
+  ...select or multiselect properties,
+  "options": {
+    "async" {
+      "label": "button text", // optional, default is "Load data"
+      "action": "sync-action-name"
+    }
+  }
+}
+```
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-git clone https://bitbucket.org/kds_consulting_team/kds-team.ex-test-connection/src/master/ test-connection
-cd test-connection
-docker-compose build
-docker-compose run --rm dev
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**NOTE**: The element must resolve to select/multiselect => empty `"enum":[]` must be defined on the element.
 
-Run the test suite and lint check using this command:
+**EXAMPLE**
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-docker-compose run --rm test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```json
+ "test_columns": {
+      "type": "array",
+      "format": "select",
+      "uniqueItems": true,
+      "items": {
+        "enum": [],
+        "type": "string"
+      },
+      "options": {
+        "async": {
+          "label": "Re-load test columns",
+          "action": "testColumns"
+        }
+      }
+    }
+```
 
-Integration
-===========
-
-For information about deployment and integration with KBC, please refer to the
-[deployment section of developers
-documentation](https://developers.keboola.com/extend/component/deployment/)
+```python
+@sync_action('testColumns')
+    def get_columns(self):
+        return [
+            {"label": 'Joe', "value": 'joe'},
+            {"label": 'Doe', "value": 'doe'},
+            {"label": 'Jane', "value": 'jane'}
+        ]
+```
