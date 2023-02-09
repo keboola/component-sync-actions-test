@@ -6,40 +6,42 @@
   ],
   "properties": {
     "connection": {
-      "type": "string",
-      "title": "Connection",
       "enum": [
         "fail",
         "succeed"
       ],
+      "type": "string",
+      "title": "Connection",
+      "description": "Test connection button that triggers testConnection sync action.",
       "propertyOrder": 1
     },
     "test_columns": {
       "type": "array",
-      "format": "select",
-      "uniqueItems": true,
+      "description": "Element loaded by arbitrary sync action.",
       "items": {
         "enum": [],
         "type": "string"
       },
+      "format": "select",
       "options": {
         "async": {
           "label": "Re-load test columns",
           "action": "testColumns"
         }
-      }
+      },
+      "uniqueItems": true
     },
     "test_creatable_multi_select": {
       "type": "array",
-      "description": "Mutliselect element with no enum => user creates arbitrary values. Comma separated values are supported",
-      "uniqueItems": true,
       "items": {
-        "enum": [],
         "type": "string"
       },
+      "format": "select",
       "options": {
         "tags": true
-      }
+      },
+      "description": "Mutliselect element with no enum => user creates arbitrary values. Comma separated values are supported",
+      "uniqueItems": true
     }
   }
 }
