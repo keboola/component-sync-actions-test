@@ -1,1 +1,1 @@
-Test connection long description
+Testing component for UI Elements.

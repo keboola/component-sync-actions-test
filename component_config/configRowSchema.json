@@ -28,6 +28,18 @@
           "action": "testColumns"
         }
       }
+    },
+    "test_creatable_multi_select": {
+      "type": "array",
+      "description": "Mutliselect element with no enum => user creates arbitrary values. Comma separated values are supported",
+      "uniqueItems": true,
+      "items": {
+        "enum": [],
+        "type": "string"
+      },
+      "options": {
+        "tags": true
+      }
     }
   }
 }
