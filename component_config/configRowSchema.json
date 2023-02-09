@@ -31,6 +31,18 @@
       },
       "uniqueItems": true
     },
+    "test_columns_single": {
+      "type": "string",
+      "description": "Element loaded by arbitrary sync action. (single)",
+      "enum": [],
+      "format": "select",
+      "options": {
+        "async": {
+          "label": "Re-load test columns",
+          "action": "testColumns"
+        }
+      }
+    },
     "test_creatable_multi_select": {
       "type": "array",
       "items": {
