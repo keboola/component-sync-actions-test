@@ -5,14 +5,14 @@
     "connection"
   ],
   "properties": {
-    "connection": {
+    "test_value": {
       "enum": [
-        "fail",
-        "succeed"
+        "aa",
+        "bb"
       ],
       "type": "string",
-      "title": "Connection",
-      "description": "Test connection button that triggers testConnection sync action.",
+      "title": "Test Value",
+      "description": "Test value.",
       "propertyOrder": 1
     },
     "test_columns": {
