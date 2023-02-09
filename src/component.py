@@ -21,7 +21,7 @@ class Component(ComponentBase):
         return [
             {"label": 'Joe', "value": 'joe'},
             {"label": 'Doe', "value": 'doe'},
-            {"label": 'Jane', "value": 'jane'}
+            {"label": 'Loaded from config parameters', "value": self.configuration.parameters.get(KEY_TEST_CONNECTION)}
         ]
 
     @sync_action('testConnection')
