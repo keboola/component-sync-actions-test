@@ -1,6 +1,7 @@
 import logging
 
 from keboola.component.base import ComponentBase, sync_action
+from keboola.component.dao import TableDefinition
 from keboola.component.exceptions import UserException
 
 # configuration variables
@@ -15,6 +16,12 @@ class Component(ComponentBase):
         super().__init__()
         # to verify it works even when stdout logger is on.
         self.set_default_logger()
+
+    def _get_input_table(self) -> TableDefinition:
+        if not self.get_input_tables_definitions():
+            raise UserException("No input table specified. Please provide one input table in the input mapping! "
+                                f"{self.configuration.config_data}")
+        return self.get_input_tables_definitions()[0]
 
     @sync_action('testColumns')
     def get_columns(self):
@@ -35,6 +42,17 @@ class Component(ComponentBase):
         elif connection == "succeed":
             # this is ignored by KBC when run as sync action.
             logging.info("succeed")
+
+    @sync_action('test_input_columns')
+    def list_table_columns(self):
+        """
+        Sync action to fill the UI element of primary keys.
+
+        Returns:
+
+        """
+        input_table = self._get_input_table()
+        return [{"value": c, "label": c} for c in input_table.columns]
 
     def run(self):
         logging.info("running")

@@ -31,6 +31,22 @@
       },
       "uniqueItems": true
     },
+    "test_input_table_columns": {
+      "type": "array",
+      "description": "Element loaded by arbitrary sync action.",
+      "items": {
+        "enum": [],
+        "type": "string"
+      },
+      "format": "select",
+      "options": {
+        "async": {
+          "label": "Re-load test columns",
+          "action": "test_input_columns"
+        }
+      },
+      "uniqueItems": true
+    },
     "test_columns_single": {
       "type": "string",
       "description": "Element loaded by arbitrary sync action. (single)",
