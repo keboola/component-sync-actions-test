@@ -51,7 +51,9 @@ class Component(ComponentBase):
         Returns:
 
         """
-        input_table = self._get_input_table()
+        if not self.configuration.tables_input_mapping:
+            raise UserException("No input table specified. Please provide one input table in the input mapping!")
+        input_table = self.configuration.tables_input_mapping[0]
         return [{"value": c, "label": c} for c in input_table.columns]
 
     def run(self):

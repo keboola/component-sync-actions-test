@@ -60,6 +60,7 @@
             "type": "string",
             "title": "Filter",
             "propertyOrder": 10,
+            "enabled": false,
             "format": "select",
             "enum": [],
             "options": {
