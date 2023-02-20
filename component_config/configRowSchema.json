@@ -47,6 +47,37 @@
       },
       "uniqueItems": true
     },
+    "test_mapping": {
+      "type": "array",
+      "title": "Mapping multiple",
+      "propertyOrder": 800,
+      "format": "table",
+      "items": {
+        "type": "object",
+        "title": "Filter",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Filter",
+            "propertyOrder": 10,
+            "format": "select",
+            "enum": [],
+            "options": {
+              "async": {
+                "label": "Re-load test columns",
+                "action": "testColumns"
+              }
+            }
+          },
+          "value": {
+            "type": "string",
+            "title": "Value",
+            "propertyOrder": 20,
+            "minLength": 1
+          }
+        }
+      }
+    },
     "test_columns_single": {
       "type": "string",
       "description": "Element loaded by arbitrary sync action. (single)",
