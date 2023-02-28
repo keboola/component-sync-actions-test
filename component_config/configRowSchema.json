@@ -137,6 +137,7 @@
         },
         "message": {
           "type": "string",
+          "format": "textarea",
           "title": "Message that will be printed",
           "default": "This is display text.",
           "propertyOrder": 7
