@@ -102,6 +102,50 @@
       },
       "description": "Mutliselect element with no enum => user creates arbitrary values. Comma separated values are supported",
       "uniqueItems": true
+    },
+    "test_validation": {
+      "type": "object",
+      "title": "extractor row",
+      "required": [
+        "message",
+        "message_type"
+      ],
+      "properties": {
+        "fail": {
+          "type": "boolean",
+          "format": "checkbox",
+          "description": "If true the validate button will throw exception and print to stdout. status:error",
+          "default": false
+        },
+        "message_type": {
+          "enum": [
+            "info",
+            "warning",
+            "danger"
+          ],
+          "default": "info",
+          "type": "string",
+          "title": "Message type",
+          "propertyOrder": 5
+        },
+        "message": {
+          "type": "string",
+          "title": "Message that will be printed",
+          "default": "This is display text.",
+          "propertyOrder": 7
+        },
+        "validation_button": {
+          "type": "button",
+          "format": "generic-test",
+          "propertyOrder": 10,
+          "options": {
+            "async": {
+              "label": "Validate",
+              "action": "validate_report"
+            }
+          }
+        }
+      }
     }
   }
 }
