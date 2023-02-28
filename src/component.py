@@ -161,9 +161,9 @@ class Component(ComponentBase):
     @sync_action('testColumns')
     def get_columns(self):
         return [
+            {"label": 'Loaded from config parameters', "value": self.configuration.parameters.get('test_value')},
             {"label": 'Joe', "value": 'joe'},
-            {"label": 'Doe', "value": 'doe'},
-            {"label": 'Loaded from config parameters', "value": self.configuration.parameters.get('test_value')}
+            {"label": 'Doe', "value": 'doe'}
         ]
 
     @sync_action('testConnection')

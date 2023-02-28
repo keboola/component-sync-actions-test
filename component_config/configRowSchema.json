@@ -7,16 +7,17 @@
   "properties": {
     "test_value": {
       "enum": [
-        "aa",
-        "bb"
+        "ValueA",
+        "ValueB"
       ],
       "type": "string",
-      "title": "Test Value",
+      "title": "This will be rendered as first value of the test_columns element. Under label 'Loaded from config parameters'",
       "description": "Test value.",
       "propertyOrder": 1
     },
     "test_columns": {
       "type": "array",
+      "propertyOrder": 10,
       "description": "Element loaded by arbitrary sync action.",
       "items": {
         "enum": [],
@@ -33,6 +34,7 @@
     },
     "test_input_table_columns": {
       "type": "array",
+      "propertyOrder": 20,
       "description": "Element loaded by arbitrary sync action.",
       "items": {
         "enum": [],
@@ -50,7 +52,7 @@
     "test_mapping": {
       "type": "array",
       "title": "Mapping multiple",
-      "propertyOrder": 800,
+      "propertyOrder": 60,
       "format": "table",
       "items": {
         "type": "object",
@@ -80,6 +82,7 @@
       }
     },
     "test_columns_single": {
+      "propertyOrder": 40,
       "type": "string",
       "description": "Element loaded by arbitrary sync action. (single)",
       "enum": [],
@@ -92,6 +95,7 @@
       }
     },
     "test_creatable_multi_select": {
+      "propertyOrder": 50,
       "type": "array",
       "items": {
         "type": "string"
@@ -105,7 +109,8 @@
     },
     "test_validation": {
       "type": "object",
-      "title": "extractor row",
+      "title": "Validation Button Test",
+      "propertyOrder": 100,
       "required": [
         "message",
         "message_type"
