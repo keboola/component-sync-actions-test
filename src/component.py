@@ -3,6 +3,7 @@ import dataclasses
 import json
 import logging
 import sys
+from abc import ABC
 from dataclasses import dataclass
 from functools import wraps
 from typing import Literal
@@ -28,7 +29,7 @@ class SyncActionJSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-class SyncActionResult:
+class SyncActionResult(ABC):
     """
     Abstract base for sync action results
     """
@@ -40,7 +41,7 @@ class SyncActionResult:
 @dataclass
 class ValidationResult(SyncActionResult):
     message: str
-    type: Literal["info", "warning", "danger"] = "info"
+    type: Literal["success", "info", "warning", "danger"] = "info"
     status: Literal["success", "error"] = "success"
 
 
