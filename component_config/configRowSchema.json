@@ -2,7 +2,7 @@
   "type": "object",
   "title": "extractor row",
   "required": [
-    "connection"
+    "test_value"
   ],
   "properties": {
     "test_value": {
@@ -130,6 +130,7 @@
           ],
           "default": "success",
           "type": "string",
+          "description": "This is only for testing purposes. it affects status: property. In fact, there is only one value and required only on success -> status:success",
           "title": "status",
           "propertyOrder": 5
         },

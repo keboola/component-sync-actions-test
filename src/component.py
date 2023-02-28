@@ -44,6 +44,14 @@ class SyncActionResult(ABC):
 
     @status.setter
     def status(self, status: Literal["success", "error"] = "success"):
+        """
+        Just in case this is ever needed. Right now the status is always success.
+        Args:
+            status:
+
+        Returns:
+
+        """
         self.__status = status
 
     def __str__(self):
