@@ -123,6 +123,16 @@
           "description": "If true the validate button will throw exception and print to stdout. status:error",
           "default": false
         },
+        "status": {
+          "enum": [
+            "success",
+            "error"
+          ],
+          "default": "success",
+          "type": "string",
+          "title": "status",
+          "propertyOrder": 5
+        },
         "message_type": {
           "enum": [
             "success",

@@ -197,11 +197,12 @@ class Component(ComponentBase):
         message_type = self.configuration.parameters['test_validation']['message_type']
         message = self.configuration.parameters['test_validation']['message']
         fail = self.configuration.parameters['test_validation']['fail']
+        status = self.configuration.parameters['test_validation']['status']
+        result = ValidationResult(message, message_type, status)
         if fail:
-            result = ValidationResult(message, message_type, 'error')
-            raise UserException(result)
-        else:
-            return ValidationResult(message, message_type)
+            raise UserException(f"This is user exception, ony stderr content: {result}")
+
+        return result
 
     def run(self):
         logging.info("running")
