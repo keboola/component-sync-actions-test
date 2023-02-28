@@ -23,9 +23,10 @@ _SYNC_ACTION_MAPPING = {"run": "run"}
 
 
 class SyncActionJSONEncoder(json.JSONEncoder):
+
     def default(self, o):
         if dataclasses.is_dataclass(o):
-            return dataclasses.asdict(o)
+            return {**dataclasses.asdict(o), **{"status": o.status}}
         return super().default(o)
 
 
@@ -33,6 +34,17 @@ class SyncActionResult(ABC):
     """
     Abstract base for sync action results
     """
+
+    def __init__(self):
+        self.__status = 'success'
+
+    @property
+    def status(self) -> str:
+        return self.__status
+
+    @status.setter
+    def status(self, status: Literal["success", "error"] = "success"):
+        self.__status = status
 
     def __str__(self):
         return json.dumps(self, cls=SyncActionJSONEncoder)
@@ -42,7 +54,6 @@ class SyncActionResult(ABC):
 class ValidationResult(SyncActionResult):
     message: str
     type: Literal["success", "info", "warning", "danger"] = "info"
-    status: Literal["success", "error"] = "success"
 
 
 def sync_action(action_name: str):
@@ -126,7 +137,7 @@ def sync_action(action_name: str):
                     if result:
                         # expect array or object:
                         encoder = None
-                        if dataclasses.is_dataclass(result):
+                        if isinstance(result, SyncActionResult):
                             encoder = SyncActionJSONEncoder
                         sys.stdout.write(json.dumps(result, cls=encoder))
                     else:
@@ -198,7 +209,8 @@ class Component(ComponentBase):
         message = self.configuration.parameters['test_validation']['message']
         fail = self.configuration.parameters['test_validation']['fail']
         status = self.configuration.parameters['test_validation']['status']
-        result = ValidationResult(message, message_type, status)
+        result = ValidationResult(message, message_type)
+        result.status = status
         if fail:
             raise UserException(f"This is user exception, ony stderr content: {result}")
 
