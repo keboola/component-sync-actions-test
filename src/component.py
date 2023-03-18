@@ -6,7 +6,7 @@ import sys
 from abc import ABC
 from dataclasses import dataclass
 from functools import wraps
-from typing import Literal
+from typing import Literal, Union, List, Optional
 
 from keboola.component.base import ComponentBase
 from keboola.component.dao import TableDefinition
@@ -22,40 +22,27 @@ REQUIRED_IMAGE_PARS = []
 _SYNC_ACTION_MAPPING = {"run": "run"}
 
 
-class SyncActionJSONEncoder(json.JSONEncoder):
-
-    def default(self, o):
-        if dataclasses.is_dataclass(o):
-            return {**dataclasses.asdict(o), **{"status": o.status}}
-        return super().default(o)
-
-
+@dataclass
 class SyncActionResult(ABC):
     """
     Abstract base for sync action results
     """
 
-    def __init__(self):
-        self.__status = 'success'
-
-    @property
-    def status(self) -> str:
-        return self.__status
-
-    @status.setter
-    def status(self, status: Literal["success", "error"] = "success"):
+    def __post_init__(self):
         """
-        Just in case this is ever needed. Right now the status is always success.
-        Args:
-            status:
-
+         Right now the status is always success.
+        In other cases exception is thrown and printed via stderr.
         Returns:
 
         """
-        self.__status = status
+        self.status = 'success'
 
     def __str__(self):
-        return json.dumps(self, cls=SyncActionJSONEncoder)
+        dict_obj = dataclasses.asdict(self, dict_factory=lambda x: {k: v for (k, v) in x if v is not None})
+        # hack to add default status
+        if self.status:
+            dict_obj['status'] = self.status
+        return json.dumps(dict_obj)
 
 
 @dataclass
@@ -64,53 +51,48 @@ class ValidationResult(SyncActionResult):
     type: Literal["success", "info", "warning", "danger"] = "info"
 
 
+@dataclass
+class SelectElement(SyncActionResult):
+    """
+    For select elements. Label is optional and value will be used
+    """
+    value: str
+    label: Optional[str] = None
+
+    def __post_init__(self):
+        self.label = self.label or self.value
+        # special case of element F with no status
+        self.status = None
+
+
+def _process_sync_action_result(result: Union[None, SyncActionResult, List[SyncActionResult]]):
+    """
+    Converts Sync Action result into valid string.
+    Args:
+        result: Union[None, SyncActionResult, List[SyncActionResult]]
+
+    Returns:
+
+    """
+    if isinstance(result, SyncActionResult):
+        result_str = str(result)
+    elif isinstance(result, list):
+        result_str = f'[{", ".join([str(r) for r in result])}]'
+    elif result is None:
+        result_str = json.dumps(str(SyncActionResult()))
+    else:
+        raise ValueError("Result of sync action must be an instance of SyncActionResult "
+                         "or a List[SyncActionResult]")
+    return result_str
+
+
 def sync_action(action_name: str):
     """
-    Decorator for marking sync actions method.
-    For more info see [Sync actions](https://developers.keboola.com/extend/common-interface/actions/).
 
-    Usage:
-
-    ```
-    import csv
-    import logging
-
-    from keboola.component.base import ComponentBase, sync_action
-
-    class Component(ComponentBase):
-
-        def run(self):
-            '''
-            Main execution code
-            '''
-            pass
-
-        # sync action that is executed when configuration.json "action":"testConnection" parameter is present.
-        @sync_action('testConnection')
-        def test_connection(self):
-            connection = self.configuration.parameters.get('test_connection')
-            if connection == "fail":
-                raise UserException("failed")
-            elif connection == "succeed":
-                # this is ignored when run as sync action.
-                logging.info("succeed")
-
-
-    if __name__ == "__main__":
-        try:
-            comp = Component()
-            # this triggers the run method by default and is controlled by the configuration.action parameter
-            comp.execute_action()
-        except UserException as exc:
-            logging.exception(exc)
-            exit(1)
-        except Exception as exc:
-            logging.exception(exc)
-            exit(2)
-    ```
-
+       Decorator for marking sync actions method.
+       For more info see [Sync actions](https://developers.keboola.com/extend/common-interface/actions/).
     Args:
-        action_name:
+        action_name: Name of the action registered in Developer Portal
 
     Returns:
 
@@ -136,20 +118,14 @@ def sync_action(action_name: str):
                 stdout_redirect = sys.stdout
 
             try:
-                # when success, only specified message can be on output, so redirect stdout before.
+                # when success, only supported syntax can be in output / log, so redirect stdout before.
                 with contextlib.redirect_stdout(stdout_redirect):
-                    result = func(self, *args, **kwargs)
+                    result: Union[None, SyncActionResult, List[SyncActionResult]] = func(self, *args, **kwargs)
 
                 if is_sync_action:
                     # sync action expects valid JSON in stdout on success.
-                    if result:
-                        # expect array or object:
-                        encoder = None
-                        if isinstance(result, SyncActionResult):
-                            encoder = SyncActionJSONEncoder
-                        sys.stdout.write(json.dumps(result, cls=encoder))
-                    else:
-                        sys.stdout.write(json.dumps({'status': 'success'}))
+                    result_str = _process_sync_action_result(result)
+                    sys.stdout.write(result_str)
 
                 return result
 
@@ -181,9 +157,9 @@ class Component(ComponentBase):
     @sync_action('testColumns')
     def get_columns(self):
         return [
-            {"label": 'Loaded from config parameters', "value": self.configuration.parameters.get('test_value')},
-            {"label": 'Joe', "value": 'joe'},
-            {"label": 'Doe', "value": 'doe'}
+            SelectElement(label='Loaded from config parameters', value=self.configuration.parameters.get('test_value')),
+            SelectElement(label='Joe', value='joe'),
+            SelectElement(value='doe')
         ]
 
     @sync_action('testConnection')
