@@ -5,8 +5,9 @@ import logging
 import sys
 from abc import ABC
 from dataclasses import dataclass
+from enum import Enum
 from functools import wraps
-from typing import Literal, Union, List, Optional
+from typing import Union, List, Optional
 
 from keboola.component.base import ComponentBase
 from keboola.component.dao import TableDefinition
@@ -20,6 +21,20 @@ REQUIRED_IMAGE_PARS = []
 
 # Mapping of sync actions "action name":"method_name"
 _SYNC_ACTION_MAPPING = {"run": "run"}
+
+
+def _convert_enum_value(obj):
+    """
+    Helper to get Enums value
+    Args:
+        obj:
+
+    Returns:
+
+    """
+    if isinstance(obj, Enum):
+        return obj.value
+    return obj
 
 
 @dataclass
@@ -38,17 +53,25 @@ class SyncActionResult(ABC):
         self.status = 'success'
 
     def __str__(self):
-        dict_obj = dataclasses.asdict(self, dict_factory=lambda x: {k: v for (k, v) in x if v is not None})
+        dict_obj = dataclasses.asdict(self, dict_factory=lambda x: {k: _convert_enum_value(v) for (k, v) in x if
+                                                                    v is not None})
         # hack to add default status
         if self.status:
             dict_obj['status'] = self.status
         return json.dumps(dict_obj)
 
 
+class MessageType(Enum):
+    SUCCESS = "success"
+    INFO = "info"
+    WARNING = "warning"
+    DANGER = "danger"
+
+
 @dataclass
 class ValidationResult(SyncActionResult):
     message: str
-    type: Literal["success", "info", "warning", "danger"] = "info"
+    type: MessageType = MessageType.INFO
 
 
 @dataclass
@@ -79,9 +102,12 @@ def _process_sync_action_result(result: Union[None, SyncActionResult, List[SyncA
     elif isinstance(result, list):
         result_str = f'[{", ".join([str(r) for r in result])}]'
     elif result is None:
-        result_str = json.dumps(str(SyncActionResult()))
+        result_str = json.dumps({'status': 'success'})
+    elif isinstance(result, dict):
+        # for backward compatibility
+        result_str = json.dumps(result)
     else:
-        raise ValueError("Result of sync action must be an instance of SyncActionResult "
+        raise ValueError("Result of sync action must be either None or an instance of SyncActionResult "
                          "or a List[SyncActionResult]")
     return result_str
 
