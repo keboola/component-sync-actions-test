@@ -49,6 +49,21 @@
       },
       "uniqueItems": true
     },
+    "test_enum_source": {
+          "type": "array",
+          "title": "enumSource select",
+          "description": "Select using selected elements of test_columns",
+          "propertyOrder": 21,
+          "format": "select",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "watch": {
+              "dim": "test_columns"
+            },
+            "enumSource": "dim"
+          }
+        },
     "test_mapping": {
       "type": "array",
       "title": "Mapping multiple",
@@ -140,7 +155,7 @@
             "info",
             "warning",
             "danger"
-          ],
+           ],
           "default": "info",
           "type": "string",
           "title": "Message type",
