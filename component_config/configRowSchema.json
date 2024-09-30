@@ -154,7 +154,8 @@
             "success",
             "info",
             "warning",
-            "danger"
+            "error",
+            "table"
            ],
           "default": "info",
           "type": "string",
