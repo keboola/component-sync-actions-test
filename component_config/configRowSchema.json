@@ -179,6 +179,17 @@
               "action": "validate_report"
             }
           }
+        },
+        "show_state": {
+          "type": "button",
+          "format": "sync-action",
+          "propertyOrder": 20,
+          "options": {
+            "async": {
+              "label": "Display State",
+              "action": "show_state"
+            }
+          }
         }
       }
     }

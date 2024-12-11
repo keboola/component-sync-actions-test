@@ -1,3 +1,4 @@
+import json
 import logging
 
 from keboola.component.base import ComponentBase, sync_action
@@ -69,6 +70,10 @@ class Component(ComponentBase):
             raise UserException(f"This is user exception, ony stderr content: {result}")
 
         return result
+
+    @sync_action('show_state')
+    def show_state(self):
+        return ValidationResult(json.dumps(self.get_state_file()), 'info')
 
     def run(self):
         logging.info("running")
