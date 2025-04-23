@@ -75,6 +75,20 @@ class Component(ComponentBase):
     def show_state(self):
         return ValidationResult(json.dumps(self.get_state_file()), 'info')
 
+    @sync_action('return_response_data')
+    def return_response_data(self):
+        """
+        Sync action returning everything from to return field.
+
+        Returns:
+
+        """
+
+        data = self.configuration.parameters.get('test_sync_respose_data').get('data_to_return')
+        if not data:
+            raise UserException("No data to return defined.")
+        return data
+
     def run(self):
         logging.info("running")
 

@@ -50,20 +50,20 @@
       "uniqueItems": true
     },
     "test_enum_source": {
-          "type": "array",
-          "title": "enumSource select",
-          "description": "Select using selected elements of test_columns",
-          "propertyOrder": 21,
-          "format": "select",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "watch": {
-              "dim": "test_columns"
-            },
-            "enumSource": "dim"
-          }
+      "type": "array",
+      "title": "enumSource select",
+      "description": "Select using selected elements of test_columns",
+      "propertyOrder": 21,
+      "format": "select",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "watch": {
+          "dim": "test_columns"
         },
+        "enumSource": "dim"
+      }
+    },
     "test_mapping": {
       "type": "array",
       "title": "Mapping multiple",
@@ -156,7 +156,7 @@
             "warning",
             "error",
             "table"
-           ],
+          ],
           "default": "info",
           "type": "string",
           "title": "Message type",
@@ -188,6 +188,36 @@
             "async": {
               "label": "Display State",
               "action": "show_state"
+            }
+          }
+        }
+      }
+    },
+    "test_sync_respose_data": {
+      "type": "object",
+      "title": "Test Sync Action Response Data",
+      "propertyOrder": 200,
+      "properties": {
+        "data_to_return": {
+          "type": "string",
+          "format": "editor",
+          "options": {
+            "editor": {
+              "mode": "application/json"
+            }
+          },
+          "title": "Data to return",
+          "default": "Data to return by sync action (has to be a valid json!)",
+          "propertyOrder": 201
+        },
+        "return_response_data": {
+          "type": "button",
+          "format": "sync-action",
+          "propertyOrder": 202,
+          "options": {
+            "async": {
+              "label": "Return Value",
+              "action": "return_response_data"
             }
           }
         }
